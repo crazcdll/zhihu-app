@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Mail;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Naux\Mail\SendCloudTemplate;
 
 class RegisterController extends Controller
 {
@@ -66,7 +68,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'avatar' => '/images/avatars/default.jpg',
-            'confirmatin_token' => str_random(40),
+            'confirmation_token' => str_random(40),
             'password' => bcrypt($data['password']),
         ]);
 
@@ -74,16 +76,18 @@ class RegisterController extends Controller
         return $user;
     }
 
-    private function sendVerifyEmailTo()
+    private function sendVerifyEmailTo($user)
     {
         // 模板变量
-        $data = ['url' => 'http://naux.me'];
-        $template = new SendCloudTemplate('模板名', $bind_data);
+        $data = [
+            'url' => route('email.verify', ['token' => $user->confirmation_token]),
+            'name' => $user->name
+        ];
+        $template = new SendCloudTemplate('test_template_active', $data);
 
-        Mail::raw($template, function ($message) {
-            $message->from('us@example.com', 'Laravel');
-
-            $message->to('foo@example.com')->cc('bar@example.com');
+        Mail::raw($template, function ($message) use ($user) {
+            $message->from('2747240770@qq.com', 'zcdll');
+            $message->to($user->email);
         });
     }
 }
