@@ -12,3 +12,5 @@ yarn-error.log
 .env
 
 test.php
+
+public/vendor/ueditor
